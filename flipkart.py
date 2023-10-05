@@ -248,6 +248,7 @@ def croma(itemName):
         print("Product not found!")
 
 def inputData(itemName):
+    final_list.clear()
     # proItem = input("Enter product name:\n")
     itemName = itemName.replace(" ","+")
     
