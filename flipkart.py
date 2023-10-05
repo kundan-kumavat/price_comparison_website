@@ -22,6 +22,7 @@ cchc = ''
 
 #will contain the peices of all websites and show the best price accordingly
 final_price_list = []
+final_list = []
 #Flipkart
 def flipkart(itemName):
     print("Let's start scraping flipkart......")
@@ -37,43 +38,64 @@ def flipkart(itemName):
     soup = BeautifulSoup(req.content,'html.parser')
 
     try:
-
-            #main list
-        pro_list = soup.find_all('div',class_='_2kHMtA')
-
-            #will contain links of all product in the list
-        proLink = []
-
-        for i in pro_list:
-            for link in i.find_all('a',href=True):
-                proLink.append(baseurl + link['href'])
-
-        print(len(proLink))
-            #scrape data from particular item
-        itemLink = proLink[0]
-
-        req = requests.get(itemLink,headers=headers)
-        soup = BeautifulSoup(req.content,'html.parser')
+        
+        
+        #     print(content)
+        pro_name= soup.find('div', {"class": '_4rR01T'})
+        pro_price = soup.find('div', {"class": "_30jeq3 _1_WHN1"})
         image = soup.find_all('img',class_="_396cs4 _2amPTt _3qGmMb")
-        rating = soup.find('div', class_="_3LWZlK")
 
-        for name in soup.find_all('span',class_="B_NuCI"):
-            pro_name = name.text.strip()
-        for price in soup.find_all('div',class_="_30jeq3 _16Jk6d"):
-            pro_price = price.text.strip()
         for img in image:
             pro_image = img.get('src')
 
-            #append the price scraped in float form
-        temp_pro_price = pro_price.replace("₹","")
-        final_pro_price = float(temp_pro_price.replace(",",""))
-        final_price_list.append(final_pro_price)
-            
+            #main list
+        # pro_list = soup.find_all('div',class_='_2kHMtA')
+
+        #     #will contain links of all product in the list
+        # proLink = []
+
+        # for i in pro_list:
+        #     for link in i.find_all('a',href=True):
+        #         proLink.append(baseurl + link['href'])
+
+        # print(len(proLink))
+        #     #scrape data from particular item
+        # itemLink = proLink[0]
+
+        # req = requests.get(itemLink,headers=headers)
+        # soup = BeautifulSoup(req.content,'html.parser')
+        # image = soup.find_all('img',class_="_396cs4 _2amPTt _3qGmMb")
+        # rating = soup.find('div', class_="_3LWZlK")
+
+        # for name in soup.find_all('span',class_="B_NuCI"):
+        #     pro_name = name.text.strip()
+        # for price in soup.find_all('div',class_="_30jeq3 _16Jk6d"):
+        #     pro_price = price.text.strip()
+        # for img in image:
+        #     pro_image = img.get('src')
+
+        #     #append the price scraped in float form
+        # temp_pro_price = pro_price.replace("₹","")
+        # final_pro_price = float(temp_pro_price.replace(",",""))
+        # final_price_list.append(final_pro_price)
+
+
+        result  = {
+            'website': 'Flipkart',
+            'itemLink': flipurl,
+            'itemName': pro_name,
+            'itemPrice': pro_price,
+            'itemImage': pro_image[0]
+        }  
+
+        final_list.append(result)
+
         print("\n")    
         print(itemLink)
         print(pro_name)
         print(pro_price)
         print(pro_image)
+        # print(final_list)
         print("\n\n\nNow Let's scrape Amazon.....\n")
         ################
 
@@ -115,7 +137,7 @@ def amazon(itemName):
 
     itemName = itemName
     amazon_url = f'https://www.amazon.in/s?k={itemName}&ref=nb_sb_noss'
-    print(amazon_url)
+    # print(amazon_url)
     headers = {
         'User-agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:83.0) Gecko/20100101 Firefox/83.0'
     }
@@ -123,7 +145,7 @@ def amazon(itemName):
 
     req = requests.get(amazon_url,headers=headers)
     soup = BeautifulSoup(req.content,'html.parser')
-    print(soup)
+    # print(soup)
 
 
     pro_list = soup.find_all('div',{'data-component-type':'s-search-result'})
@@ -143,6 +165,15 @@ def amazon(itemName):
         amazonPrice = soup.find('span',class_="a-price-whole").text
             
 
+        result  = {
+            'website': 'Amazon',
+            'itemLink': amazon_url,
+            'itemName': name,
+            'itemPrice': amazonPrice,
+            'itemImage': prodImageLink
+        } 
+
+        final_list.append(result)
 #         temp_pro_price = amazonPrice.replace("₹","")
 #         final_pro_price = float(temp_pro_price.replace(",",""))
 #         final_price_list.append(final_pro_price)
@@ -150,6 +181,7 @@ def amazon(itemName):
         print("\nName:",name)
         print("Product Link: ",amazon_url)
         print("Price:",amazonPrice)
+        # print(result)
         time.sleep(2)
     except:
         print("Product not found!")
@@ -193,30 +225,39 @@ def croma(itemName):
 
         cromaPrice = prod.find('span',class_='amount').text
         
+
+        result  = {
+            'website': 'Croma',
+            'itemLink': prodLink,
+            'itemName': name,
+            'itemPrice': cromaPrice,
+            'itemImage': prodImageLink
+        } 
+
+        final_list.append(result)
         #append the price scraped in float form
         temp_pro_price = cromaPrice.replace("₹","")
         final_pro_price = float(temp_pro_price.replace(",",""))
         final_price_list.append(final_pro_price)
         
         print("\nPrice:",cromaPrice)
+        print(result)
         print("\n\n\nNow Let's scrape Ajio.........\n")
 
     except:
         print("Product not found!")
 
-def inputData():
-    proItem = input("Enter product name:\n")
-    itemName = proItem.replace(" ","+")
+def inputData(itemName):
+    # proItem = input("Enter product name:\n")
+    itemName = itemName.replace(" ","+")
     
-    print("\n\nWebsites you can compare your product from\n[1] Flipkart\n[2] Amazon\n[3] Croma\n[4] Ajio \n\n More websites coming soon! \n\n")
-    cchc == input("Start Comparing? [Y/N]:\n")
+    # print("\n\nWebsites you can compare your product from\n[1] Flipkart\n[2] Amazon\n[3] Croma\n[4] Ajio \n\n More websites coming soon! \n\n")
+    # cchc == input("Start Comparing? [Y/N]:\n")
         
-    if cchc == 'Y' or 'y':
-        print("\n\n\nCool let's start then!")
-        # flipkart(itemName)
-        amazon(itemName)
-        # croma(itemName)
-    else:
-        exit(1)
-
-inputData()
+    # if cchc == 'Y' or 'y':
+    # print("\n\n\nCool let's start then!")
+    flipkart(itemName)
+    amazon(itemName)
+    croma(itemName)
+    print(final_list)
+    return final_list
