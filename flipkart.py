@@ -13,6 +13,7 @@ from bs4 import BeautifulSoup
 # Get all info from the link below
 #https://www.selenium.dev/documentation/en/getting_started_with_webdriver/browsers/
 options = webdriver.ChromeOptions()
+# options.add_argument('--headless')
 
 #uncomment the below code if you don't want a browser window to open
 # options.add_argument('--headless') 
